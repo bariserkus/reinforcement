@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-NUM_TRIALS = 10000
+NUM_TRIALS = 100000
 EPS = 0.1
 BANDIT_PROBABILITIES = [0.2, 0.5, 0.75]
 
@@ -21,7 +21,7 @@ class Bandit:
     # p: the win rate
     self.p = p
     self.p_estimate = 0 # TODO
-    self.N = 1 # TODO
+    self.N = 0.1 # TODO
 
   def pull(self):
     # draw a 1 with probability p
@@ -30,7 +30,12 @@ class Bandit:
   def update(self, x):
     if x == 1:
       self.N += 1 # TODO
-    self.p_estimate += self.p_estimate + (x - self.p_estimate)/self.N # TODO
+    # print("p estimate:", self.p_estimate)
+    # print("x:", x)
+    # print("N:", self.N)
+    self.p_estimate += (x - self.p_estimate)/self.N # TODO
+    # print("New p estimate:", self.p_estimate)
+    # wait = input("Press Enter to continue.")
 
 
 def experiment():
@@ -52,6 +57,8 @@ def experiment():
     else:
       num_times_exploited += 1
       j = np.argmax([b.p for b in bandits]) # TODO
+
+    # print("j:", j)
 
     if j == optimal_j:
       num_optimal += 1
