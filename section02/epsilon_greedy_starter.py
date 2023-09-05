@@ -1,4 +1,4 @@
-# From the course: Bayesin Machine Learning in Python: A/B Testing
+# From the course: Bayesian Machine Learning in Python: A/B Testing
 # https://deeplearningcourses.com/c/bayesian-machine-learning-in-python-ab-testing
 # https://www.udemy.com/bayesian-machine-learning-in-python-ab-testing
 from __future__ import print_function, division
@@ -20,16 +20,17 @@ class Bandit:
   def __init__(self, p):
     # p: the win rate
     self.p = p
-    self.p_estimate = # TODO
-    self.N = # TODO
+    self.p_estimate = 0 # TODO
+    self.N = 1 # TODO
 
   def pull(self):
     # draw a 1 with probability p
     return np.random.random() < self.p
 
   def update(self, x):
-    self.N = # TODO
-    self.p_estimate = # TODO
+    if x == 1:
+      self.N += 1 # TODO
+    self.p_estimate += self.p_estimate + (x - self.p_estimate)/self.N # TODO
 
 
 def experiment():
@@ -47,10 +48,10 @@ def experiment():
     # use epsilon-greedy to select the next bandit
     if np.random.random() < EPS:
       num_times_explored += 1
-      j = # TODO
+      j = np.random.randint(0,2) # TODO
     else:
       num_times_exploited += 1
-      j = # TODO
+      j = np.argmax([b.p for b in bandits]) # TODO
 
     if j == optimal_j:
       num_optimal += 1
@@ -63,8 +64,6 @@ def experiment():
 
     # update the distribution for the bandit whose arm we just pulled
     bandits[j].update(x)
-
-    
 
   # print mean estimates for each bandit
   for b in bandits:
@@ -83,6 +82,7 @@ def experiment():
   plt.plot(win_rates)
   plt.plot(np.ones(NUM_TRIALS)*np.max(BANDIT_PROBABILITIES))
   plt.show()
+
 
 if __name__ == "__main__":
   experiment()
