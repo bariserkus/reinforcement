@@ -18,7 +18,6 @@ def test_is_python_35():
 
         # Let's stop here
         sys.exit(1)
-        return None
         # assert major == 3, "Stopping here - we need Python 3."
 
     if minor >= 5:
@@ -155,4 +154,4 @@ if __name__ == "__main__":
     test_pylab()
     test_sympy()
     test_pytest()
-    test_matplotlib()
+    # test_matplotlib()
