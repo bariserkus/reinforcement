@@ -101,3 +101,28 @@ def standard_grid():
     }
     g.set(rewards, actions)
     return g
+
+
+def print_values(V, g):
+    for i in range(g.rows):
+        print("------------------------")
+        print("|", end="")
+        for j in range(g.cols):
+            v = V.get((i, j), 0)
+            if v >= 0:
+                print(" %.2f|" % v, end="")
+            else:
+                print("%.2f|" % v, end="")
+        print("")
+    print("------------------------")
+
+
+def print_policy(P, g):
+    for i in range(g.rows):
+        print("------------------------")
+        print("|", end="")
+        for j in range(g.cols):
+            a = P.get((i, j), " ")
+            print("  %s  |" % a, end="")
+        print("")
+    print("------------------------")

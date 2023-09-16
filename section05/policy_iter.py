@@ -5,13 +5,12 @@ import numpy as np
 from grid_class import standard_grid, ACTION_SPACE, print_values, print_policy
 
 SMALL_ENOUGH = 1e-3
+GAMMA = 0.9
 
 
-def main():
-    transition_probs = {}
-    rewards = {}
-
-    g = standard_grid()
+def get_tp_and_rew(g):
+    tp = {}
+    rew = {}
 
     for i in range(g.rows):
         for j in range(g.cols):
@@ -19,31 +18,19 @@ def main():
             if not g.is_terminal(s):
                 for a in ACTION_SPACE:
                     s2 = g.get_next_state(s, a)
-                    transition_probs[(s, a, s2)] = 1
+                    tp[(s, a, s2)] = 1
                     if s2 in g.rewards:
-                        rewards[(s, a, s2)] = g.rewards[s2]
+                        rew[(s, a, s2)] = g.rewards[s2]
 
-    ### fixed policy ###
-    policy = {
-        (2, 0): "U",
-        (1, 0): "U",
-        (0, 0): "R",
-        (0, 1): "R",
-        (0, 2): "R",
-        (1, 2): "U",
-        (2, 1): "R",
-        (2, 2): "U",
-        (2, 3): "L",
-    }
-    print_policy(policy, g)
+    return tp, rew
 
-    # Initialize V(s) --> zero
-    V = {}
-    for s in g.all_states():
-        V[s] = 0
 
-    # discount factor
-    gamma = 0.9
+def eval_pol(g, pol, initV=None):
+    if initV is None:
+        V = {}
+        for s in g.all_states():
+            V[s] = 0
+    V = initV
 
     # Repeat until convergence
     it = 0
@@ -76,7 +63,3 @@ def main():
         if biggest_change < SMALL_ENOUGH:
             break
     print("\n\n")
-
-
-if __name__ == "__main__":
-    main()
