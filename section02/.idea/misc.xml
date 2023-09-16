@@ -5,7 +5,7 @@
     <option name="pathToExecutable" value="/usr/bin/black" />
     <option name="sdkUUID" value="a2b73ee3-13bd-4425-88fd-45d73f0a211e" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (section02)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (myenv) (2)" project-jdk-type="Python SDK" />
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>
