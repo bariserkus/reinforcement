@@ -1,7 +1,4 @@
 from __future__ import print_function, division
-from builtins import range
-
-import numpy as np
 
 ACTION_SPACE = ("U", "D", "L", "R")
 
@@ -37,16 +34,16 @@ class Grid:  # Environment
 
     def get_next_state(self, s, a):
         # this function gives the next state, when an action "a" is performed on a given state s
-        i = s[0], j = s[1]
-        if a in self.actions[(self.i, self.j)]:
+        i, j = s[0], s[1]
+        if a in self.actions[(i, j)]:
             if a == "U":
                 i -= 1
             elif a == "D":
                 i += 1
-            if a == "L":
-                j -= 1
-            elif a == "D":
+            elif a == "R":
                 j += 1
+            elif a == "L":
+                j -= 1
         return i, j
 
     def move(self, a):
@@ -55,20 +52,20 @@ class Grid:  # Environment
                 self.i -= 1
             elif a == "D":
                 self.i += 1
-            if a == "L":
-                self.j -= 1
-            elif a == "D":
+            elif a == "R":
                 self.j += 1
+            elif a == "L":
+                self.j -= 1
         return self.rewards[(self.i, self.j)]
 
     def move_opposite(self, a):
         if a == "U":
             self.i += 1
         elif a == "D":
-            self.i += 1
-        if a == "L":
+            self.i -= 1
+        elif a == "R":
             self.j -= 1
-        elif a == "D":
+        elif a == "L":
             self.j += 1
         assert self.current_state() in self.all_states()
 
