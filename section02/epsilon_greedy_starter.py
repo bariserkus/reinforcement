@@ -29,7 +29,8 @@ class Bandit:
 
   def update(self, x):
     self.N += 1 # TODO
-    self.p_estimate += (x - self.p_estimate)/self.N # TODO
+    #self.p_estimate += (x - self.p_estimate)/self.N # TODO
+    self.p_estimate = ((self.N - 1) * self.p_estimate + x) / self.N
 
 
 def experiment():
