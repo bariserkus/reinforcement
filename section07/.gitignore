@@ -399,3 +399,10 @@ fabric.properties
 
 # vim swap file
 *.swp
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/other.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/section07.iml
+/.idea/vcs.xml
