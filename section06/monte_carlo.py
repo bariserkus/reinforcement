@@ -7,7 +7,7 @@ from builtins import range
 
 
 import numpy as np
-from grid_world import standard_grid, negative_grid
+from grid_world import standard_grid
 from iterative_policy_evaluation import print_values, print_policy
 
 GAMMA = 0.9
@@ -80,8 +80,8 @@ if __name__ == '__main__':
   # initialize V(s) and returns
   V = {}
   returns = {} # dictionary of state -> list of returns we've received
-  states = grid.all_states()
-  for s in states:
+  states_all = grid.all_states()
+  for s in states_all:
     if s in grid.actions:
       returns[s] = []
     else:
@@ -91,16 +91,18 @@ if __name__ == '__main__':
   # repeat
   for _ in range(100):
     # generate an episode using pi
-    states, rewards = play_game(grid, policy)
+    # print(" States before the game:", states_)
+    states_, rewards = play_game(grid, policy)
+    # print(" States after the game:", states_)
     G = 0
-    T = len(states)
+    T = len(states_)
     for t in range(T - 2, -1, -1):
-      s = states[t]
+      s = states_[t]
       r = rewards[t+1]
       G = r + GAMMA * G # update return
 
       # we'll use first-visit Monte Carlo
-      if s not in states[:t]:
+      if s not in states_[:t]:
         returns[s].append(G)
         V[s] = np.mean(returns[s])
 
