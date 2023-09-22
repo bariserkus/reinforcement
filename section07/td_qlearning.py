@@ -16,12 +16,12 @@ def max_dict(d):
 
     return np.random.choice(max_keys), max_val
 
-def eps_greedy(Q, s, eps=0.1):
+def eps_greedy(q, st, eps=0.1):
     p = np.random.random()
     if p < eps:
         return np.random.choice(ALL_POSSIBLE_ACTIONS)
     else:
-        a_opt = max_dict(Q[s])[0]
+        a_opt = max_dict(q[st])[0]
         return a_opt
 
 
