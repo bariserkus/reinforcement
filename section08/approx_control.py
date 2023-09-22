@@ -2,8 +2,9 @@ from __future__ import print_function, division
 from builtins import range
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from grid_class import standard_grid, print_values, print_policy
+from grid_class import negative_grid, print_values, print_policy
 from sklearn.kernel_approximation import Nystroem, RBFSampler
 
 GAMMA = 0.9
@@ -32,11 +33,10 @@ def gather_samples(g, n_episodes=1000):
     samples = []
     for _ in range(n_episodes):
         s = g.reset()
-        samples.append(s)
         while not g.game_over():
             a = np.random.choice(ALL_POSSIBLE_ACTIONS)
             sa = merge_state_action(s, a)
-            samples.append(s)
+            samples.append(sa)
 
             r = g.move(a)
             s = g.current_state()
@@ -53,35 +53,29 @@ class Model:
 
         self.w = np.zeros(dims)
 
-    def predict(self, s):
-        x = self.featurizer.transform([s])[0]
+    def predict(self, s, a):
+        sa = merge_state_action(s, a)
+        x = self.featurizer.transform([sa])[0]
         return x @ self.w
 
-    def grad(self, s):
-        x = self.featurizer.transform([s])[0]
+    def predict_all_actions(self, s):
+        return [self.predict(s, a) for a in ALL_POSSIBLE_ACTIONS]
+
+    def grad(self, s, a):
+        sa = merge_state_action(s, a)
+        x = self.featurizer.transform([sa])[0]
         return x
 
 
 if __name__ == '__main__':
-    grid = standard_grid()
+    grid = negative_grid(step_cost=-0.1)
 
     print("Rewards: ")
     print_values(grid.rewards, grid)
 
-    greedy_policy = {
-        (2, 0): "U",
-        (1, 0): "U",
-        (0, 0): "R",
-        (0, 1): "R",
-        (0, 2): "R",
-        (1, 2): "R",
-        (2, 1): "R",
-        (2, 2): "R",
-        (2, 3): "U",
-    }
-
     model = Model(grid)
-    mse_per_episode = []
+    reward_per_episode = []
+    state_visit_count = {}
 
     n_episodes = 10000
     for it in range(n_episodes):
@@ -89,43 +83,42 @@ if __name__ == '__main__':
             print(it + 1)
 
         s = grid.reset()
-        Vs = model.predict(s)
-        n_steps = 0
-        episode_err = 0
-
+        state_visit_count[s] = state_visit_count.get(s, 0) + 1
+        episode_reward = 0
         while not grid.game_over():
-            a = eps_greedy(greedy_policy, s)
+            a = eps_greedy(model, s)
             r = grid.move(a)
             s2 = grid.current_state()
+            state_visit_count[s2] = state_visit_count.get(s2, 0) + 1
 
             if grid.is_terminal(s2):
                 target = r
             else:
-                Vs2 = model.predict(s2)
-                target = r + GAMMA * Vs2
+                values = model.predict_all_actions(s2)
+                target = r + GAMMA * np.max(values)
 
-            grad = model.grad(s)
-            err = target - Vs
+            grad = model.grad(s, a)
+            err = target - model.predict(s, a)
             model.w += ALPHA * err * grad
 
-            n_steps += 1
-            episode_err += err*err
+            episode_reward += r
 
             s = s2
-            Vs = Vs2
 
-        mse = episode_err / n_steps
-        mse_per_episode.append(mse)
+        reward_per_episode.append(episode_reward)
 
-    plt.plot(mse_per_episode)
+    plt.plot(reward_per_episode)
     plt.title("MSE per episode")
     plt.show()
 
     V = {}
+    policy = {}
     states = grid.all_states()
     for s in states:
         if s in grid.actions:
-            V[s] = model.predict(s)
+            values = model.predict_all_actions(s)
+            V[s] = np.max(values)
+            policy[s] = ALL_POSSIBLE_ACTIONS[np.argmax(values)]
         else:
             V[s] = 0
 
@@ -133,7 +126,17 @@ if __name__ == '__main__':
     print_values(V, grid)
 
     print("Policy:")
-    print_policy(greedy_policy, grid)
+    print_policy(policy, grid)
+
+    print("state_visit_count:")
+    state_sample_count_arr = np.zeros((grid.rows, grid.cols))
+    for i in range(grid.rows):
+        for j in range(grid.cols):
+            if (i, j) in state_visit_count:
+                state_sample_count_arr[i, j] = state_visit_count[(i, j)]
+    df = pd.DataFrame(state_sample_count_arr)
+    print(df)
+
 
 
 
